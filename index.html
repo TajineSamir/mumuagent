@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moon Formations</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;background:#f5f4f0;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:32px 16px;}
+.app{width:100%;max-width:700px;background:#fff;border-radius:16px;border:1px solid #e8e4db;padding:2rem;}
+.header{padding-bottom:1rem;border-bottom:1px solid #e8e4db;margin-bottom:2rem;display:flex;justify-content:space-between;align-items:center;}
+.logo{font-family:Georgia,serif;font-size:16px;color:#C9A84C;letter-spacing:.08em;}
+.logo-sub{font-size:11px;color:#888;letter-spacing:.1em;text-transform:uppercase;margin-top:2px;}
+.hbtn-top{padding:7px 14px;background:#faf9f6;border:1px solid #e8e4db;border-radius:8px;font-size:12px;font-weight:600;color:#555;cursor:pointer;display:flex;align-items:center;gap:6px;}
+.hbadge{background:#C9A84C;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;}
+.steps{display:flex;margin-bottom:1.75rem;border:1px solid #e8e4db;border-radius:10px;overflow:hidden;}
+.pill{flex:1;padding:9px 8px;font-size:12px;color:#aaa;text-align:center;background:#faf9f6;border-right:1px solid #e8e4db;}
+.pill:last-child{border-right:none;}
+.pill.done{background:#eaf3de;color:#3B6D11;}
+.pill.active{background:#fff;color:#1a1a10;font-weight:600;}
+.step{display:none;}
+.step.on{display:block;}
+.sh{font-size:17px;font-weight:600;color:#1a1a10;margin-bottom:4px;}
+.sd{font-size:13px;color:#666;margin-bottom:1.25rem;line-height:1.5;}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem;}
+.card{border:1.5px solid #e8e4db;border-radius:12px;padding:1.25rem;cursor:pointer;background:#fff;user-select:none;}
+.card:hover{border-color:#C9A84C;background:#fdfcf8;}
+.card.sel{border:2px solid #C9A84C;background:#fdfcf8;}
+.cbadge{display:inline-block;font-size:10px;padding:2px 9px;border-radius:20px;margin-bottom:8px;}
+.b1{background:#dbeafe;color:#1e40af;}
+.b2{background:#d1fae5;color:#065f46;}
+.ctitle{font-size:16px;font-weight:600;color:#1a1a10;margin-bottom:5px;}
+.csub{font-size:12px;color:#666;line-height:1.5;}
+.fr{margin-bottom:1rem;}
+.fr label{display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px;}
+.fr input{width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;color:#1a1a10;outline:none;background:#fff;}
+.fr input:focus{border-color:#C9A84C;}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.bloc{background:#faf9f6;border:1px solid #e8e4db;border-radius:12px;padding:1.25rem;margin-bottom:1.25rem;}
+.bloc-t{font-size:13px;font-weight:600;color:#1a1a10;margin-bottom:3px;}
+.bloc-d{font-size:12px;color:#888;margin-bottom:10px;}
+.srow{display:flex;gap:8px;}
+.srow input{flex:1;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;color:#1a1a10;outline:none;font-family:monospace;background:#fff;}
+.srow input:focus{border-color:#C9A84C;}
+.sbtn{padding:9px 16px;background:#1a1a10;color:#C9A84C;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;min-width:110px;}
+.sbtn:disabled{background:#ccc;color:#888;cursor:not-allowed;}
+.sres{margin-top:10px;border-radius:8px;padding:11px 14px;font-size:13px;line-height:1.65;display:none;}
+.sres.on{display:block;}
+.c-ok{background:#ecfdf5;border:1px solid #10b981;color:#065f46;}
+.c-wa{background:#fffbeb;border:1px solid #f59e0b;color:#92400e;}
+.c-er{background:#fef2f2;border:1px solid #ef4444;color:#991b1b;}
+.c-lo{background:#f0f4ff;border:1px solid #93c5fd;color:#1e40af;}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid #93c5fd;border-top-color:#1e40af;border-radius:50%;animation:sp .7s linear infinite;margin-right:6px;vertical-align:middle;}
+@keyframes sp{to{transform:rotate(360deg);}}
+.irow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.iinput{padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:16px;color:#1a1a10;outline:none;font-family:monospace;letter-spacing:.1em;background:#fff;width:130px;}
+.iinput:focus{border-color:#C9A84C;}
+.ichip{padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;}
+.ic-f{background:#dbeafe;color:#1e40af;}
+.ic-nf{background:#fef9c3;color:#854d0e;font-size:12px;font-weight:400;}
+.ic-e{color:#aaa;font-size:13px;}
+.ilink{font-size:12px;margin-top:6px;}
+.ilink a{color:#1e40af;font-weight:600;text-decoration:underline;margin-right:10px;}
+.alert{padding:10px 14px;border-radius:8px;font-size:12px;line-height:1.6;margin-bottom:1rem;}
+.a-w{background:#fffbeb;border:1px solid #f59e0b;color:#92400e;}
+.a-s{background:#ecfdf5;border:1px solid #10b981;color:#065f46;}
+.pw{margin-bottom:1.25rem;}
+.pm{font-size:12px;color:#666;margin-bottom:5px;display:flex;justify-content:space-between;}
+.pb{height:5px;background:#f0ece4;border-radius:3px;overflow:hidden;}
+.pf{height:100%;background:#C9A84C;border-radius:3px;transition:width .3s;}
+.cls{margin-bottom:1.25rem;}
+.clst{font-size:11px;font-weight:700;color:#888;letter-spacing:.08em;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #f0ece4;margin-bottom:8px;}
+.cli{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;}
+.cli:hover{background:#faf9f6;}
+.cli input[type=checkbox]{margin-top:3px;flex-shrink:0;width:15px;height:15px;cursor:pointer;accent-color:#C9A84C;}
+.cll{font-size:13px;color:#1a1a10;line-height:1.4;}
+.cll.ck{text-decoration:line-through;color:#aaa;}
+.cln{font-size:11px;color:#888;margin-top:2px;line-height:1.4;}
+.req{font-size:10px;color:#ef4444;margin-left:3px;}
+.opt{font-size:10px;color:#aaa;margin-left:3px;}
+.ebox{background:#faf9f6;border:1px solid #e8e4db;border-radius:12px;padding:1.25rem;margin-bottom:1rem;}
+.ef{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid #e8e4db;font-size:13px;}
+.ef:last-of-type{border-bottom:none;margin-bottom:8px;}
+.efl{font-weight:700;color:#888;min-width:55px;font-size:12px;}
+.efv{color:#1a1a10;font-size:13px;}
+.ebody{font-size:13px;color:#1a1a10;line-height:1.75;white-space:pre-wrap;margin-top:12px;padding-top:12px;border-top:1px solid #e8e4db;}
+.nr{display:flex;gap:8px;margin-top:1.5rem;}
+.btn{flex:1;padding:10px 16px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;}
+.btn-p{background:#C9A84C;color:#fff;}
+.btn-p:hover{background:#b8963e;}
+.btn-p:disabled{background:#e0d5b8;color:#aaa;cursor:not-allowed;}
+.btn-s{background:#f5f4f0;color:#555;border:1px solid #ddd;}
+.btn-s:hover{background:#edecea;}
+.btn-copy{width:100%;padding:11px;font-size:14px;font-weight:600;background:#1a1a10;color:#C9A84C;border:none;border-radius:8px;cursor:pointer;}
+.btn-copy.cp{background:#065f46;color:#d1fae5;}
+.btn-mail{width:100%;padding:11px;font-size:14px;font-weight:600;background:#C9A84C;color:#fff;border:none;border-radius:8px;cursor:pointer;margin-top:8px;text-decoration:none;display:block;text-align:center;}
+.btn-mail:hover{background:#b8963e;}
+.hcard{background:#faf9f6;border:1px solid #e8e4db;border-radius:12px;padding:1rem 1.25rem;margin-bottom:12px;}
+.hcard-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+.hcard-info{flex:1;}
+.hcard-title{font-size:14px;font-weight:600;color:#1a1a10;}
+.hcard-meta{font-size:11px;color:#888;margin-top:3px;line-height:1.5;}
+.htag{display:inline-block;font-size:10px;padding:2px 9px;border-radius:20px;font-weight:600;flex-shrink:0;margin-top:2px;}
+.ht-o{background:#dbeafe;color:#1e40af;}
+.ht-f{background:#d1fae5;color:#065f46;}
+.hcard-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.hbtn{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;}
+.hbtn-v{background:#1a1a10;color:#C9A84C;}
+.hbtn-e{background:#f5f4f0;color:#1a1a10;border:1px solid #ddd;}
+.hbtn-d{background:#fef2f2;color:#991b1b;border:1px solid #fca5a5;}
+.hempty{text-align:center;padding:2rem;color:#aaa;font-size:13px;}
+.overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center;padding:16px;}
+.overlay.on{display:flex;}
+.modal{background:#fff;border-radius:16px;padding:2rem;max-width:620px;width:100%;max-height:85vh;overflow-y:auto;position:relative;}
+.modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:20px;cursor:pointer;color:#888;}
+.modal-title{font-size:16px;font-weight:600;color:#1a1a10;margin-bottom:1rem;padding-right:2rem;}
+.modal-email{background:#faf9f6;border:1px solid #e8e4db;border-radius:10px;padding:1.25rem;}
+.modal-f{font-size:12px;color:#888;padding:4px 0;border-bottom:1px solid #e8e4db;}
+.modal-f span{font-weight:600;color:#1a1a10;}
+.modal-body{font-size:13px;color:#1a1a10;line-height:1.75;white-space:pre-wrap;margin-top:12px;padding-top:12px;border-top:1px solid #e8e4db;}
+.modal-actions{display:flex;gap:8px;margin-top:1rem;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div>
+      <div class="logo">Moon Formations</div>
+      <div class="logo-sub">Generateur de dossier financement</div>
+    </div>
+    <button class="hbtn-top" id="btn-histo">Historique <span class="hbadge" id="histo-count">0</span></button>
+  </div>
+  <div class="steps" id="steps-bar">
+    <div class="pill active" id="p1">1. Dispositif</div>
+    <div class="pill" id="p2">2. Client</div>
+    <div class="pill" id="p3">3. Documents</div>
+    <div class="pill" id="p4">4. Email</div>
+  </div>
+
+  <div class="step on" id="s1">
+    <div class="sh">Quel dispositif de financement ?</div>
+    <div class="sd">Selectionnez le fonds correspondant au profil de votre client.</div>
+    <div class="cards">
+      <div class="card" id="card-opco"><span class="cbadge b1">Salaries</span><div class="ctitle">OPCO</div><div class="csub">Pour les entreprises avec salaries.</div></div>
+      <div class="card" id="card-faf"><span class="cbadge b2">Artisans</span><div class="ctitle">FAFCEA</div><div class="csub">Pour chefs d entreprise artisanale inscrits au RNE.</div></div>
+    </div>
+    <button class="btn btn-p" id="btn-s1-next" disabled>Continuer</button>
+  </div>
+
+  <div class="step" id="s2">
+    <div class="sh">Informations du client</div>
+    <div class="sd">Renseignez les informations du client.</div>
+    <div class="bloc">
+      <div class="bloc-t">Recherche par SIRET</div>
+      <div class="bloc-d">Entrez le SIRET pour recuperer le nom de l entreprise et du gerant.</div>
+      <div class="srow">
+        <input type="text" id="f-siret" placeholder="ex : 89533962000018" maxlength="14" inputmode="numeric">
+        <button class="sbtn" id="btn-siret" disabled>Rechercher</button>
+      </div>
+      <div class="sres" id="siret-res"></div>
+    </div>
+    <div class="fg">
+      <div class="fr"><label>Nom de l entreprise *</label><input type="text" id="f-ent" placeholder="ex : Plomberie Martin"></div>
+      <div class="fr"><label>Email du client *</label><input type="email" id="f-email" placeholder="marie@exemple.fr"></div>
+    </div>
+    <div class="fg">
+      <div class="fr"><label>Prenom du contact *</label><input type="text" id="f-prenom" placeholder="ex : Marie"></div>
+      <div class="fr"><label>Nom du contact *</label><input type="text" id="f-nom" placeholder="ex : Martin"></div>
+    </div>
+    <div class="fr"><label>Intitule de la formation *</label><input type="text" id="f-form" placeholder="ex : Excel tous niveaux"></div>
+    <div class="bloc" id="idcc-bloc" style="display:none;">
+      <div class="bloc-t">Identification de l OPCO par IDCC</div>
+      <div class="bloc-d">Entrez l IDCC visible sur les bulletins de paie.</div>
+      <div class="irow">
+        <input type="text" class="iinput" id="f-idcc" placeholder="ex : 1979" maxlength="5" inputmode="numeric">
+        <div id="idcc-chip" class="ic-e">-</div>
+      </div>
+      <div class="ilink" id="idcc-links" style="display:none;">
+        <a href="https://quel-est-mon-opco.francecompetences.fr/" target="_blank">France Competences</a>
+        <a id="opco-url" href="#" target="_blank" style="display:none;">Site OPCO</a>
+      </div>
+    </div>
+    <div class="nr">
+      <button class="btn btn-s" id="btn-s2-back">Retour</button>
+      <button class="btn btn-p" id="btn-s2-next">Continuer</button>
+    </div>
+  </div>
+
+  <div class="step" id="s3">
+    <div class="sh" id="s3-title">Documents necessaires</div>
+    <div class="sd" id="s3-desc"></div>
+    <div class="pw">
+      <div class="pm"><span id="prog-txt">0 / 0</span><span id="prog-pct">0%</span></div>
+      <div class="pb"><div class="pf" id="prog-fill" style="width:0%"></div></div>
+    </div>
+    <div id="doc-body"></div>
+    <div class="nr">
+      <button class="btn btn-s" id="btn-s3-back">Retour</button>
+      <button class="btn btn-p" id="btn-s3-next">Generer l email</button>
+    </div>
+  </div>
+
+  <div class="step" id="s4">
+    <div class="sh">Email pret a envoyer</div>
+    <div class="sd">Copiez ou ouvrez dans votre messagerie.</div>
+    <div class="alert" id="email-status"></div>
+    <div class="ebox">
+      <div class="ef"><span class="efl">A :</span><span class="efv" id="em-to"></span></div>
+      <div class="ef"><span class="efl">Objet :</span><span class="efv" id="em-subj"></span></div>
+      <div class="ebody" id="em-body"></div>
+    </div>
+    <button class="btn-copy" id="btn-copy">Copier l email complet</button>
+    <a class="btn-mail" id="btn-mail" href="#">Ouvrir dans ma messagerie</a>
+    <div class="nr" style="margin-top:12px;">
+      <button class="btn btn-s" id="btn-s4-back">Modifier</button>
+      <button class="btn btn-p" id="btn-s4-new">Nouveau dossier</button>
+    </div>
+  </div>
+
+  <div class="step" id="s5">
+    <div class="sh">Historique des dossiers</div>
+    <div class="sd" id="histo-desc"></div>
+    <div id="histo-body"></div>
+    <div class="nr" style="margin-top:1rem;">
+      <button class="btn btn-s" id="btn-s5-back">Retour</button>
+      <button class="btn" id="btn-s5-clear" style="background:#fef2f2;color:#991b1b;border:1px solid #fca5a5;flex:1;">Tout effacer</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <button class="modal-close" id="modal-close">&#x2715;</button>
+    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-email">
+      <div class="modal-f">A : <span id="m-to"></span></div>
+      <div class="modal-f">Objet : <span id="m-subj"></span></div>
+      <div class="modal-body" id="m-body"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-p" id="modal-copy" style="font-size:13px;padding:9px 14px;flex:0 0 auto;">Copier</button>
+      <a class="btn btn-p" id="modal-mail" href="#" style="font-size:13px;padding:9px 14px;text-decoration:none;text-align:center;flex:1;">Ouvrir messagerie</a>
+    </div>
+  </div>
+</div>
+
+<script>
+var IDCC_MAP = {"158":"AKTO","275":"AKTO","573":"AKTO","1266":"AKTO","1351":"AKTO","1413":"AKTO","1501":"AKTO","1516":"AKTO","1944":"AKTO","1979":"AKTO","2002":"AKTO","2060":"AKTO","2147":"AKTO","2149":"AKTO","2378":"AKTO","2583":"AKTO","2691":"AKTO","3043":"AKTO","3218":"AKTO","3219":"AKTO","3243":"AKTO","5017":"AKTO","7520":"AKTO","478":"OPCO Atlas","787":"OPCO Atlas","1486":"OPCO Atlas","1672":"OPCO Atlas","2120":"OPCO Atlas","1596":"Constructys","1597":"Constructys","1702":"Constructys","3212":"Constructys","1581":"OCAPIAT","1987":"OCAPIAT","7004":"OCAPIAT","7024":"OCAPIAT","843":"OPCO EP","959":"OPCO EP","1147":"OPCO EP","1605":"OPCO EP","1619":"OPCO EP","1875":"OPCO EP","2098":"OPCO EP","3032":"OPCO EP","44":"OPCO 2i","247":"OPCO 2i","650":"OPCO 2i","2075":"OPCO 2i","3248":"OPCO 2i","16":"OPCO Mobilites","1090":"OPCO Mobilites","1120":"OPCO Mobilites","51":"OPCO Sante","413":"OPCO Sante","2264":"OPCO Sante","1285":"AFDAS","1480":"AFDAS","2642":"AFDAS","66":"Uniformation","1518":"Uniformation","1505":"Opcommerce","1517":"Opcommerce","2216":"Opcommerce"};
+var OPCO_URLS = {"AKTO":"https://www.akto.fr","OPCO Atlas":"https://www.opco-atlas.fr","Constructys":"https://www.constructys.fr","OCAPIAT":"https://www.ocapiat.fr","OPCO EP":"https://www.opcoep.fr","OPCO 2i":"https://www.opco2i.fr","OPCO Mobilites":"https://www.opcomobilites.fr","OPCO Sante":"https://www.opco-sante.fr","AFDAS":"https://www.afdas.com","Uniformation":"https://www.uniformation.fr","Opcommerce":"https://www.opco-commerce.fr"};
+var DOCS = {
+  opco:[
+    {s:"Documents obligatoires",items:[{id:"kbis",l:"K-Bis de l entreprise (de moins de 3 mois)",n:"",r:true},{id:"paie",l:"Derniere fiche de paie du / des stagiaire(s)",n:"",r:true},{id:"coord",l:"Coordonnees du / des stagiaires",n:"Adresse mail et numero de telephone",r:true},{id:"idpce",l:"Carte vitale et piece d identite",n:"A defaut : numero de securite sociale, ville et date de naissance",r:true}]},
+    {s:"Optionnel",items:[{id:"espace",l:"Identifiant et mot de passe de votre espace OPCO",n:"Permet a Moon Formations de deposer le dossier directement",r:false}]}
+  ],
+  fafcea:[
+    {s:"Documents obligatoires",items:[{id:"dpc",l:"Formulaire de prise en charge complete et signe par le stagiaire",n:"Nous vous le fournissons pre-rempli",r:true,lnk:"https://www.fafcea.com/wp-content/uploads/2024/12/DPC-au-07.11.2024.pdf"},{id:"prog",l:"Programme pedagogique detaille",n:"Fourni par Moon Formations",r:true},{id:"rne",l:"Extrait d inscription au Registre National des Entreprises (RNE)",n:"A telecharger sur data.inpi.fr",r:true},{id:"cfp",l:"Attestation de CFP (Contribution de Formation Professionnelle)",n:"A telecharger sur votre espace URSSAF",r:true}]},
+    {s:"Optionnel",items:[{id:"acces",l:"Identifiants pour acceder a la plateforme FAFCEA",n:"Permet a Moon Formations de deposer le dossier directement",r:false}]}
+  ]
+};
+
+var device=null, opcoFound=null, idccFound=null, currentEmail={to:"",subject:"",body:""};
+
+function E(id){return document.getElementById(id);}
+
+function goStep(n){
+  for(var i=1;i<=5;i++) E("s"+i).classList.toggle("on",i===n);
+  E("steps-bar").style.display=n===5?"none":"flex";
+  for(var j=1;j<=4;j++){var p=E("p"+j);p.classList.remove("active","done");if(j===n)p.classList.add("active");else if(j<n)p.classList.add("done");}
+  if(n===2) E("idcc-bloc").style.display=device==="opco"?"block":"none";
+  if(n===3){buildDocs();updProg();}
+  if(n===4) buildEmail();
+  if(n===5) renderHisto();
+  window.scrollTo(0,0);
+}
+
+E("card-opco").addEventListener("click",function(){device="opco";E("card-opco").classList.add("sel");E("card-faf").classList.remove("sel");E("btn-s1-next").disabled=false;});
+E("card-faf").addEventListener("click",function(){device="fafcea";E("card-faf").classList.add("sel");E("card-opco").classList.remove("sel");E("btn-s1-next").disabled=false;});
+E("btn-s1-next").addEventListener("click",function(){goStep(2);});
+E("btn-s2-back").addEventListener("click",function(){goStep(1);});
+E("btn-s2-next").addEventListener("click",function(){goStep(3);});
+E("btn-s3-back").addEventListener("click",function(){goStep(2);});
+E("btn-s3-next").addEventListener("click",function(){goStep(4);});
+E("btn-s4-back").addEventListener("click",function(){goStep(3);});
+E("btn-s4-new").addEventListener("click",function(){restart();});
+E("btn-histo").addEventListener("click",function(){goStep(5);});
+E("btn-s5-back").addEventListener("click",function(){goStep(1);});
+E("btn-s5-clear").addEventListener("click",function(){if(confirm("Effacer tout l historique ?")){localStorage.removeItem("mf_dossiers");renderHisto();updBadge();}});
+E("modal-close").addEventListener("click",function(){E("overlay").classList.remove("on");});
+E("overlay").addEventListener("click",function(e){if(e.target===this)this.classList.remove("on");});
+
+E("f-siret").addEventListener("input",function(){this.value=this.value.replace(/\D/g,"");E("btn-siret").disabled=this.value.length!==14;});
+E("btn-siret").addEventListener("click",function(){doSiret();});
+
+async function doSiret(){
+  var siret=E("f-siret").value.replace(/\D/g,"");
+  if(siret.length!==14)return;
+  var siren=siret.substring(0,9);
+  E("btn-siret").disabled=true;E("btn-siret").textContent="...";
+  var box=E("siret-res");
+  box.className="sres on c-lo";
+  box.innerHTML='<span class="spin"></span> Recherche...';
+  var nom="",prenom="",nomDir="",forme="",code="";
+  try{
+    var r=await fetch("https://recherche-entreprises.api.gouv.fr/search?q="+siret+"&page=1&per_page=1");
+    var d=await r.json();
+    var e=d.results&&d.results[0];
+    if(e){
+      nom=e.nom_complet||e.nom_raison_sociale||"";
+      forme=e.nature_juridique_label||e.forme_juridique||"";
+      code=String(e.nature_juridique||e.categorie_juridique||"");
+      var jmap={"5710":"SASU","5720":"SAS","5499":"SARL","5498":"EURL","5306":"SNC","5191":"SA","1000":"Entrepreneur individuel"};
+      if(!forme&&jmap[code])forme=jmap[code];
+      if(e.dirigeants&&e.dirigeants.length>0){var dir=e.dirigeants[0];prenom=dir.prenom||"";nomDir=dir.nom||dir.denomination||"";}
+    }
+  }catch(err){}
+  if(nom)E("f-ent").value=nom;
+  if(prenom)E("f-prenom").value=prenom;
+  if(nomDir)E("f-nom").value=nomDir;
+  var isSASU=code==="5710"||forme.toLowerCase().indexOf("sasu")>-1;
+  var isSAS=code==="5720"||(forme.toLowerCase().indexOf("actions simplifiee")>-1&&forme.toLowerCase().indexOf("unipersonnelle")===-1);
+  if(device==="fafcea"&&(isSASU||isSAS)){
+    box.className="sres on c-er";
+    box.innerHTML="<strong>"+(nom||"Entreprise trouvee")+"</strong>"+(forme?"<div style='font-size:12px;margin-top:3px;'>Forme juridique : <strong>"+forme+"</strong></div>":"")+"<div style='margin-top:8px;font-weight:600;'>Cette entreprise n est pas eligible au FAFCEA.</div><div style='font-size:12px;margin-top:3px;'>Les SASU et SAS ne peuvent pas beneficier du financement FAFCEA.</div><div style='margin-top:6px;font-size:12px;'><a href='https://www.pappers.fr/entreprise/"+siren+"' target='_blank' style='color:#991b1b;font-weight:600;'>Voir sur Pappers</a></div>";
+  }else if(nom){
+    box.className="sres on c-ok";
+    box.innerHTML="<strong>"+nom+"</strong>"+(forme?"<div style='font-size:12px;margin-top:2px;'>Forme juridique : "+forme+"</div>":"")+((prenom||nomDir)?"<div style='font-size:12px;margin-top:2px;'>Dirigeant : "+[prenom,nomDir].filter(Boolean).join(" ")+"</div>":"")+"<div style='margin-top:6px;font-size:12px;'><a href='https://www.pappers.fr/entreprise/"+siren+"' target='_blank' style='color:#065f46;font-weight:600;margin-right:12px;'>Pappers</a><a href='https://quel-est-mon-opco.francecompetences.fr/' target='_blank' style='color:#065f46;font-weight:600;'>France Competences</a></div>";
+  }else{
+    box.className="sres on c-wa";
+    box.innerHTML="Aucune donnee trouvee.<div style='margin-top:6px;font-size:12px;'><a href='https://www.pappers.fr/entreprise/"+siren+"' target='_blank' style='color:#92400e;font-weight:600;margin-right:12px;'>Pappers</a><a href='https://quel-est-mon-opco.francecompetences.fr/' target='_blank' style='color:#92400e;font-weight:600;'>France Competences</a></div>";
+  }
+  E("btn-siret").disabled=false;E("btn-siret").textContent="Rechercher";
+}
+
+E("f-idcc").addEventListener("input",function(){
+  var val=this.value.replace(/\D/g,"");this.value=val;
+  var chip=E("idcc-chip"),links=E("idcc-links"),slink=E("opco-url");
+  if(!val){chip.className="ic-e";chip.textContent="-";links.style.display="none";opcoFound=null;idccFound=null;return;}
+  var found=IDCC_MAP[String(parseInt(val,10))]||null;
+  idccFound=val;opcoFound=found;
+  if(found){chip.className="ichip ic-f";chip.textContent=found;links.style.display="block";var url=OPCO_URLS[found];if(url){slink.href=url;slink.textContent="Site "+found;slink.style.display="inline";}else slink.style.display="none";}
+  else if(val.length>=4){chip.className="ichip ic-nf";chip.textContent="IDCC non reconnu";links.style.display="block";slink.style.display="none";}
+  else{chip.className="ic-e";chip.textContent="-";links.style.display="none";}
+});
+
+function buildDocs(){
+  var prenom=E("f-prenom").value||"votre client";
+  E("s3-title").textContent="Documents necessaires - "+(device==="opco"?"OPCO":"FAFCEA");
+  E("s3-desc").textContent="Cochez les documents deja recus de "+prenom+". Les elements obligatoires sont marques *.";
+  var body=E("doc-body");body.innerHTML="";
+  DOCS[device].forEach(function(sec){
+    var s=document.createElement("div");s.className="cls";
+    var t=document.createElement("div");t.className="clst";t.textContent=sec.s;s.appendChild(t);
+    sec.items.forEach(function(item){
+      var row=document.createElement("div");row.className="cli";row.setAttribute("data-id",item.id);
+      row.addEventListener("click",function(){togDoc(this);});
+      var cb=document.createElement("input");cb.type="checkbox";cb.id="cb-"+item.id;
+      var wrap=document.createElement("div");
+      var lbl=document.createElement("div");lbl.className="cll";lbl.id="lbl-"+item.id;lbl.textContent=item.l;
+      var badge=document.createElement("span");badge.className=item.r?"req":"opt";badge.textContent=item.r?" *":" (optionnel)";
+      lbl.appendChild(badge);wrap.appendChild(lbl);
+      if(item.n){var note=document.createElement("div");note.className="cln";note.textContent=item.n;wrap.appendChild(note);}
+      row.appendChild(cb);row.appendChild(wrap);s.appendChild(row);
+    });
+    body.appendChild(s);
+  });
+}
+
+function togDoc(el){var cb=el.querySelector("input[type=checkbox]");cb.checked=!cb.checked;E("lbl-"+el.getAttribute("data-id")).classList.toggle("ck",cb.checked);updProg();}
+
+function updProg(){
+  var req=[];DOCS[device].forEach(function(s){s.items.forEach(function(i){if(i.r)req.push(i);});});
+  var done=req.filter(function(i){var c=E("cb-"+i.id);return c&&c.checked;});
+  var pct=req.length?Math.round(done.length/req.length*100):0;
+  E("prog-fill").style.width=pct+"%";E("prog-txt").textContent=done.length+" / "+req.length+" documents recus";E("prog-pct").textContent=pct+"%";
+}
+
+function getMissing(){var m=[];DOCS[device].forEach(function(s){s.items.forEach(function(i){if(i.r){var c=E("cb-"+i.id);if(!c||!c.checked)m.push(i);}});});return m;}
+
+E("btn-copy").addEventListener("click",function(){
+  var full="Objet : "+currentEmail.subject+"\n\n"+currentEmail.body;
+  if(navigator.clipboard){navigator.clipboard.writeText(full).then(function(){E("btn-copy").textContent="Email copie !";E("btn-copy").classList.add("cp");setTimeout(function(){E("btn-copy").textContent="Copier l email complet";E("btn-copy").classList.remove("cp");},2500);});}
+});
+
+function buildEmail(){
+  var prenom=E("f-prenom").value||"[Prenom]";
+  var emailTo=E("f-email").value||"";
+  var ent=E("f-ent").value||"";
+  var formation=E("f-form").value||"[Formation]";
+  var missing=getMissing();
+  var subject,body;
+  if(device==="opco"){
+    subject="Financement OPCO - Documents necessaires pour votre dossier de formation";
+    body="Bonjour "+prenom+",\n\nSuite a votre accord pour la formation \""+formation+"\", nous allons constituer votre dossier de prise en charge aupres de votre OPCO.\n";
+    if(opcoFound)body+="\nOPCO identifie : "+opcoFound+(idccFound?" (IDCC "+idccFound+")":"")+"\n";
+    var m0=DOCS.opco[0].items.filter(function(i){var c=E("cb-"+i.id);return !c||!c.checked;});
+    var m1=DOCS.opco[1].items.filter(function(i){var c=E("cb-"+i.id);return !c||!c.checked;});
+    if(m0.length>0){body+="\n--- DOCUMENTS NECESSAIRES ---\n\nOBLIGATOIRES\n";m0.forEach(function(i){body+=" -> "+i.l+"\n";});}
+    if(m1.length>0){body+="\nOPTIONNEL\n";m1.forEach(function(i){body+=" -> "+i.l+"\n";});}
+    if(missing.length===0)body+="\nTous les documents sont recus - nous allons deposer votre dossier.\n";
+    body+="\nDes reception du dossier complet, nous gerons l integralite des demarches.\n\nBonne journee,\nMoon Formations - S&J Group\ncontact@moonformations.fr";
+  }else{
+    subject="Financement FAFCEA - Documents necessaires pour votre dossier de formation";
+    body="Bonjour "+prenom+",\n\nSuite a votre accord pour la formation \""+formation+"\", nous allons constituer votre dossier aupres du FAFCEA.\n";
+    var mf0=DOCS.fafcea[0].items.filter(function(i){var c=E("cb-"+i.id);return !c||!c.checked;});
+    var mf1=DOCS.fafcea[1].items.filter(function(i){var c=E("cb-"+i.id);return !c||!c.checked;});
+    if(mf0.length>0){
+      body+="\n--- DOCUMENTS NECESSAIRES ---\n\nOBLIGATOIRES\n";
+      mf0.forEach(function(i){body+=" -> "+i.l+"\n";if(i.lnk)body+="    Telecharger : "+i.lnk+"\n";});
+    }
+    if(mf1.length>0){body+="\nOPTIONNEL\n";mf1.forEach(function(i){body+=" -> "+i.l+"\n";});}
+    if(missing.length===0)body+="\nTous les documents sont recus - nous allons deposer votre dossier FAFCEA.\n";
+    body+="\nUne fois votre dossier complet, nous gerons tout.\n\nRestant a votre disposition,\nMoon Formations - S&J Group\ncontact@moonformations.fr";
+  }
+  E("em-to").textContent=emailTo||"[email client]";
+  E("em-subj").textContent=subject;
+  E("em-body").textContent=body;
+  var st=E("email-status");
+  if(missing.length===0){st.className="alert a-s";st.textContent="Dossier complet - l email confirme la reception et annonce le depot.";}
+  else{st.className="alert a-w";st.textContent=missing.length+" document(s) encore manquant(s).";}
+  E("btn-mail").href="mailto:"+encodeURIComponent(emailTo)+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
+  currentEmail={to:emailTo,subject:subject,body:body};
+  saveDossier({id:Date.now(),date:new Date().toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}),device:device,entreprise:ent||prenom,prenom:E("f-prenom").value||"",nom:E("f-nom").value||"",formation:formation,opco:opcoFound||"",idcc:idccFound||"",email:emailTo,subject:subject,body:body,missing:missing.length});
+}
+
+function saveDossier(d){var list=getDossiers();list.unshift(d);localStorage.setItem("mf_dossiers",JSON.stringify(list));updBadge();}
+function getDossiers(){try{return JSON.parse(localStorage.getItem("mf_dossiers"))||[];}catch(e){return[];}}
+function updBadge(){E("histo-count").textContent=getDossiers().length;}
+
+function renderHisto(){
+  var list=getDossiers();
+  var body=E("histo-body");body.innerHTML="";
+  E("histo-desc").textContent=list.length===0?"Aucun dossier enregistre.":list.length+" dossier(s) enregistre(s).";
+  if(list.length===0){body.innerHTML="<div class='hempty'>Les dossiers apparaissent ici des que vous generez un email.</div>";return;}
+  list.forEach(function(d){
+    var card=document.createElement("div");card.className="hcard";
+    var isO=d.device==="opco";
+    var st=d.missing>0?"<span style='color:#ef4444;font-weight:600;'>"+d.missing+" doc(s) manquant(s)</span>":"<span style='color:#065f46;font-weight:600;'>Complet</span>";
+    card.innerHTML="<div class='hcard-top'><div class='hcard-info'><div class='hcard-title'>"+d.entreprise+"</div><div class='hcard-meta'>"+d.date+" | "+d.formation+(d.opco?" | "+d.opco:"")+"</div><div class='hcard-meta'>"+(d.email?d.email+" | ":"")+st+"</div></div><span class='htag "+(isO?"ht-o":"ht-f")+"'>"+(isO?"OPCO":"FAFCEA")+"</span></div><div class='hcard-actions'><button class='hbtn hbtn-v'>Voir email</button><button class='hbtn hbtn-e'>Modifier</button><button class='hbtn hbtn-d'>Supprimer</button></div>";
+    card.querySelector(".hbtn-v").addEventListener("click",function(){openModal(d);});
+    card.querySelector(".hbtn-e").addEventListener("click",function(){loadDossier(d);});
+    card.querySelector(".hbtn-d").addEventListener("click",function(){var l=getDossiers().filter(function(x){return x.id!==d.id;});localStorage.setItem("mf_dossiers",JSON.stringify(l));updBadge();renderHisto();});
+    body.appendChild(card);
+  });
+}
+
+function loadDossier(d){
+  device=d.device;
+  E("card-opco").classList.toggle("sel",d.device==="opco");
+  E("card-faf").classList.toggle("sel",d.device==="fafcea");
+  E("btn-s1-next").disabled=false;
+  E("f-ent").value=d.entreprise||"";E("f-email").value=d.email||"";
+  E("f-prenom").value=d.prenom||"";E("f-nom").value=d.nom||"";E("f-form").value=d.formation||"";
+  opcoFound=d.opco||null;idccFound=d.idcc||null;
+  if(d.idcc){E("f-idcc").value=d.idcc;if(d.opco){E("idcc-chip").className="ichip ic-f";E("idcc-chip").textContent=d.opco;E("idcc-links").style.display="block";var url=OPCO_URLS[d.opco];if(url){E("opco-url").href=url;E("opco-url").textContent="Site "+d.opco;E("opco-url").style.display="inline";}}}
+  E("f-siret").value="";E("btn-siret").disabled=true;E("siret-res").className="sres";
+  goStep(1);
+}
+
+function openModal(d){
+  E("modal-title").textContent=d.entreprise+" - "+d.formation;
+  E("m-to").textContent=d.email||"[email client]";
+  E("m-subj").textContent=d.subject;
+  E("m-body").textContent=d.body;
+  E("modal-mail").href="mailto:"+encodeURIComponent(d.email||"")+"?subject="+encodeURIComponent(d.subject)+"&body="+encodeURIComponent(d.body);
+  E("modal-copy").onclick=function(){var full="Objet : "+d.subject+"\n\n"+d.body;if(navigator.clipboard){navigator.clipboard.writeText(full).then(function(){E("modal-copy").textContent="Copie !";setTimeout(function(){E("modal-copy").textContent="Copier";},2000);});}};
+  E("overlay").classList.add("on");
+}
+
+function restart(){
+  device=null;opcoFound=null;idccFound=null;currentEmail={to:"",subject:"",body:""};
+  E("card-opco").classList.remove("sel");E("card-faf").classList.remove("sel");E("btn-s1-next").disabled=true;
+  E("f-siret").value="";E("btn-siret").disabled=true;E("siret-res").className="sres";
+  E("f-idcc").value="";E("idcc-chip").className="ic-e";E("idcc-chip").textContent="-";E("idcc-links").style.display="none";
+  ["f-ent","f-email","f-prenom","f-nom","f-form"].forEach(function(id){E(id).value="";});
+  goStep(1);
+}
+
+updBadge();
+</script>
+</body>
+</html>
